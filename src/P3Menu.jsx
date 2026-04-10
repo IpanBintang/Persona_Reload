@@ -170,7 +170,7 @@ export default function P3Menu() {
       `}</style>
 
       <div className="p3-root">
-        <video className="p3-video" src="https://res.cloudinary.com/dt1acsnkg/video/upload/v1775838369/document_6253496834224824402_dpeupv.mp4" autoPlay loop muted playsInline />
+        <video className="p3-video" src="https://res.cloudinary.com/dt1acsnkg/video/upload/v1775828358/main1_leubqt.mp4" autoPlay loop muted playsInline />
         <div className="p3-circle" />
         <div className="p3-bg-word">SYSTEM</div>
         <div className="p3-scanlines" />
