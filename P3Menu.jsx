@@ -171,7 +171,7 @@ export default function P3Menu() {
       `}</style>
 
       <div className="p3-root">
-        <video className="p3-video" src="/bg.mp4" autoPlay loop muted playsInline />
+        <video className="p3-video" src={bgVideo} autoPlay loop muted playsInline />
         <div className="p3-circle" />
         <div className="p3-bg-word">SYSTEM</div>
         <div className="p3-scanlines" />
