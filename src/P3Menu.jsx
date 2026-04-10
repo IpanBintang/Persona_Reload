@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const ITEMS = [
   { id: "about",  label: "ABOUT ME",    href: "#about",  fontSize: 130, offsetX: 0,  offsetY: 0  },
-  { id: "resume", label: "RESUME",      href: "#resume", fontSize: 108, offsetX: 38, offsetY: -8 },
+  { id: "resume", label: "RESUME",      href: "ResumePage.jsx", fontSize: 108, offsetX: 38, offsetY: -8 },
   { id: "github", label: "GITHUB LINK", href: "https://github.com/IpanBintang", fontSize: 88, offsetX: 14, offsetY: -6 },
 ];
 
