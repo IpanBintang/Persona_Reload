@@ -99,7 +99,7 @@ export default function AboutMe() {
 
   return (
     <div id="menu-screen">
-      <video src={bgVideo} autoPlay loop muted playsInline />
+     <video className="p3-video" src="https://res.cloudinary.com/dt1acsnkg/video/upload/v1775829801/main2_biouug.mp4" autoPlay loop muted playsInline />
       {revealed && <div key={`dim-${active}`} className="sc-dim" />}
       {revealed && (
         <div key={`panel-${active}`} className={`sc-reveal-panel${mounted ? " mounted" : ""}`}>
