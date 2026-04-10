@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";  // ✅ Added React Router
+import { useNavigate } from "react-router-dom";
 
 const ITEMS = [
   { id: "about",  label: "ABOUT ME",    href: "#about",  fontSize: 130, offsetX: 0,  offsetY: 0  },
@@ -13,8 +13,8 @@ const CLIP_SHAPES = [
   (w, h) => `polygon(0px ${h*0.1}px, ${w - h*0.4}px 0px, ${w}px ${h*0.45}px, ${w - h*0.25}px ${h}px, ${h*0.05}px ${h*0.9}px)`,
 ];
 
-export default function P3Menu() {
-  const navigate = useNavigate();  // ✅ Added navigate hook
+export default function P3Menu({ onNavigate }) {  // ✅ Added onNavigate prop
+  const navigate = useNavigate();
   const [active, setActive] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -29,32 +29,34 @@ export default function P3Menu() {
       if (e.key === "ArrowDown") setActive(i => Math.min(ITEMS.length - 1, i + 1));
       if (e.key === "Enter") {
         const item = ITEMS[active];
-        if (item.id === "resume") {
-          // ✅ Navigate to resume page
-          navigate("/resume");
-        } else if (item.href.startsWith("http")) {
-          // ✅ External link (GitHub)
-          window.open(item.href, "_blank");
-        } else {
-          // ✅ About me - stays on current page
-          // Could scroll to #about if needed
-        }
+        handleItemClick(item);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active, navigate]);  // ✅ Added navigate to dependencies
+  }, [active]);
 
   const handleItemClick = (item) => {
-    if (item.id === "resume") {
-      // ✅ Navigate to resume page
-      navigate("/resume");
-    } else if (item.href.startsWith("http")) {
-      // ✅ External link (GitHub)
-      window.open(item.href, "_blank");
-    } else {
-      // ✅ About me - stays on current page
-      // Could scroll to #about if needed
+    switch (item.id) {
+      case "resume":
+        if (onNavigate) {
+          onNavigate("resume");  // ✅ Use parent prop
+        } else {
+          navigate("/resume");   // ✅ Fallback
+        }
+        break;
+      case "about":
+        if (onNavigate) {
+          onNavigate("about");
+        } else {
+          navigate("/about");
+        }
+        break;
+      case "github":
+        window.open(item.href, "_blank");  // ✅ External link
+        break;
+      default:
+        break;
     }
   };
 
@@ -132,7 +134,7 @@ export default function P3Menu() {
 
         .p3-row {
           position: relative;
-          cursor: pointer;  // ✅ Changed from pointer to cursor:pointer
+          cursor: pointer;
           display: flex;
           align-items: center;
           line-height: 1;
@@ -140,7 +142,7 @@ export default function P3Menu() {
           opacity: 0;
           transform: translateX(-36px);
           transition: opacity 0.38s ease, transform 0.38s cubic-bezier(0.22,1,0.36,1);
-          user-select: none;  // ✅ Added for better UX
+          user-select: none;
         }
         .p3-row.mounted {
           opacity: 1 !important;
@@ -216,7 +218,7 @@ export default function P3Menu() {
             const clipFn = CLIP_SHAPES[i] ?? CLIP_SHAPES[0];
 
             return (
-              <div  // ✅ Changed from <a> to <div>
+              <div
                 key={item.id}
                 className={`p3-row ${isActive ? "active" : ""} ${mounted ? "mounted" : ""}`}
                 style={{
@@ -225,10 +227,10 @@ export default function P3Menu() {
                   transitionDelay: mounted ? `${i * 80}ms` : "0ms",
                 }}
                 onMouseEnter={() => setActive(i)}
-                onClick={() => handleItemClick(item)}  // ✅ Added click handler
-                role="button"  // ✅ Accessibility
-                tabIndex={0}   // ✅ Keyboard accessibility
-                aria-current={isActive ? "page" : undefined}  // ✅ Fixed syntax error
+                onClick={() => handleItemClick(item)}
+                role="button"
+                tabIndex={0}
+                aria-current={isActive ? "page" : undefined}
                 aria-label={`Navigate to ${item.label.toLowerCase()}`}
               >
                 <div
