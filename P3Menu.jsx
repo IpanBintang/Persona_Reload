@@ -1,3 +1,4 @@
+import bgVideo from './assets/Mainn.mp4'
 import { useState, useEffect } from "react";
 
 const ITEMS = [
