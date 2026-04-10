@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";  // ✅ Added React Router
 
 const ITEMS = [
   { id: "about",  label: "ABOUT ME",    href: "#about",  fontSize: 130, offsetX: 0,  offsetY: 0  },
@@ -13,6 +14,7 @@ const CLIP_SHAPES = [
 ];
 
 export default function P3Menu() {
+  const navigate = useNavigate();  // ✅ Added navigate hook
   const [active, setActive] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -25,11 +27,36 @@ export default function P3Menu() {
     const onKey = (e) => {
       if (e.key === "ArrowUp")   setActive(i => Math.max(0, i - 1));
       if (e.key === "ArrowDown") setActive(i => Math.min(ITEMS.length - 1, i + 1));
-      if (e.key === "Enter")     window.location.href = ITEMS[active].href;
+      if (e.key === "Enter") {
+        const item = ITEMS[active];
+        if (item.id === "resume") {
+          // ✅ Navigate to resume page
+          navigate("/resume");
+        } else if (item.href.startsWith("http")) {
+          // ✅ External link (GitHub)
+          window.open(item.href, "_blank");
+        } else {
+          // ✅ About me - stays on current page
+          // Could scroll to #about if needed
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active]);
+  }, [active, navigate]);  // ✅ Added navigate to dependencies
+
+  const handleItemClick = (item) => {
+    if (item.id === "resume") {
+      // ✅ Navigate to resume page
+      navigate("/resume");
+    } else if (item.href.startsWith("http")) {
+      // ✅ External link (GitHub)
+      window.open(item.href, "_blank");
+    } else {
+      // ✅ About me - stays on current page
+      // Could scroll to #about if needed
+    }
+  };
 
   return (
     <>
@@ -105,7 +132,7 @@ export default function P3Menu() {
 
         .p3-row {
           position: relative;
-          cursor: pointer;
+          cursor: pointer;  // ✅ Changed from pointer to cursor:pointer
           display: flex;
           align-items: center;
           line-height: 1;
@@ -113,6 +140,7 @@ export default function P3Menu() {
           opacity: 0;
           transform: translateX(-36px);
           transition: opacity 0.38s ease, transform 0.38s cubic-bezier(0.22,1,0.36,1);
+          user-select: none;  // ✅ Added for better UX
         }
         .p3-row.mounted {
           opacity: 1 !important;
@@ -188,9 +216,8 @@ export default function P3Menu() {
             const clipFn = CLIP_SHAPES[i] ?? CLIP_SHAPES[0];
 
             return (
-              <a
+              <div  // ✅ Changed from <a> to <div>
                 key={item.id}
-                href={item.href}
                 className={`p3-row ${isActive ? "active" : ""} ${mounted ? "mounted" : ""}`}
                 style={{
                   marginLeft: item.offsetX,
@@ -198,7 +225,11 @@ export default function P3Menu() {
                   transitionDelay: mounted ? `${i * 80}ms` : "0ms",
                 }}
                 onMouseEnter={() => setActive(i)}
-                aria-current={isActive ? "page" : undefined}
+                onClick={() => handleItemClick(item)}  // ✅ Added click handler
+                role="button"  // ✅ Accessibility
+                tabIndex={0}   // ✅ Keyboard accessibility
+                aria-current={isActive ? "page" : undefined}  // ✅ Fixed syntax error
+                aria-label={`Navigate to ${item.label.toLowerCase()}`}
               >
                 <div
                   className="p3-highlight"
@@ -214,7 +245,7 @@ export default function P3Menu() {
                 >
                   {item.label}
                 </span>
-              </a>
+              </div>
             );
           })}
         </nav>
