@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ITEMS = [
-  { id: "about",   label: "ABOUT ME",    fontSize: 100 },
-  { id: "resume",  label: "RESUME",      fontSize: 82  },
-  { id: "github",  label: "GITHUB LINK", fontSize: 68  },
-  { id: "socials", label: "SOCIALS",     fontSize: 82  },
+  { id: "about",   label: "ABOUT ME",    fontSize: 96  },
+  { id: "resume",  label: "RESUME",      fontSize: 80  },
+  { id: "github",  label: "GITHUB LINK", fontSize: 66  },
+  { id: "socials", label: "SOCIALS",     fontSize: 80  },
 ];
 
 export default function P3Menu({ onNavigate }) {
@@ -14,7 +14,7 @@ export default function P3Menu({ onNavigate }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 100);
+    const t = setTimeout(() => setMounted(true), 80);
     return () => clearTimeout(t);
   }, []);
 
@@ -22,32 +22,36 @@ export default function P3Menu({ onNavigate }) {
     const onKey = (e) => {
       if (e.key === "ArrowUp")   setActive(i => Math.max(0, i - 1));
       if (e.key === "ArrowDown") setActive(i => Math.min(ITEMS.length - 1, i + 1));
-      if (e.key === "Enter")     handleSelect(ITEMS[active].id);
+      if (e.key === "Enter")     handleClick(ITEMS[active]);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [active]);
 
-  const handleSelect = (id) => {
-    if (id === "github") { window.open("https://github.com/IpanBintang", "_blank"); return; }
-    onNavigate ? onNavigate(id) : navigate(`/${id}`);
+  const handleClick = (item) => {
+    if (item.id === "github") {
+      window.open("https://github.com/IpanBintang", "_blank");
+    } else {
+      onNavigate ? onNavigate(item.id) : navigate(`/${item.id}`);
+    }
   };
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
         .p3-root {
           position: relative;
           width: 100%;
-          min-height: 100svh;
+          height: 100svh;
           background: #04060f;
           overflow: hidden;
           display: flex;
           align-items: center;
           justify-content: flex-end;
         }
+
         .p3-video {
           position: absolute;
           inset: 0;
@@ -57,24 +61,36 @@ export default function P3Menu({ onNavigate }) {
           z-index: 0;
           pointer-events: none;
         }
-        .p3-mask {
+
+        .p3-gradient {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to right, rgba(4,6,15,0.15) 0%, rgba(4,6,15,0.55) 60%, rgba(4,6,15,0.85) 100%);
+          background: linear-gradient(to right, transparent 30%, rgba(4,6,15,0.7) 100%);
           z-index: 1;
           pointer-events: none;
         }
-        .p3-stripe  { position:absolute; right:0; top:0; bottom:0; width:6px; background:#c4001a; z-index:10; }
-        .p3-stripe2 { position:absolute; right:10px; top:0; bottom:0; width:2px; background:rgba(196,0,26,0.3); z-index:10; }
+
+        .p3-scanlines {
+          position: absolute; inset: 0;
+          background-image: repeating-linear-gradient(
+            0deg, transparent, transparent 3px,
+            rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+          );
+          z-index: 2;
+          pointer-events: none;
+        }
+
+        .p3-stripe  { position:absolute; right:0; top:0; bottom:0; width:5px; background:#c4001a; z-index:10; pointer-events:none; }
+        .p3-stripe2 { position:absolute; right:9px; top:0; bottom:0; width:2px; background:rgba(196,0,26,0.3); z-index:10; pointer-events:none; }
 
         .p3-menu {
           position: relative;
           z-index: 20;
-          padding: 0 40px 0 0;
+          padding: 0 60px 0 0;
           display: flex;
           flex-direction: column;
           align-items: flex-end;
-          gap: 0px;
+          gap: 0;
         }
 
         .p3-row {
@@ -83,60 +99,64 @@ export default function P3Menu({ onNavigate }) {
           display: flex;
           align-items: center;
           justify-content: flex-end;
-          gap: 16px;
-          line-height: 1;
+          text-decoration: none;
           opacity: 0;
-          transform: translateX(48px);
+          transform: translateX(40px);
           transition: opacity 0.38s ease, transform 0.38s cubic-bezier(0.22,1,0.36,1);
+          padding: 2px 0;
         }
         .p3-row.mounted {
           opacity: 1;
           transform: translateX(0);
         }
 
-        .p3-triangle {
-          width: 0; height: 0;
-          border-top: 14px solid transparent;
-          border-bottom: 14px solid transparent;
-          border-left: 24px solid #ff2a2a;
-          opacity: 0;
-          transform: scaleX(0);
-          transform-origin: right center;
-          transition: opacity 0.15s ease, transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
-          flex-shrink: 0;
-        }
-        .p3-row.active .p3-triangle {
-          opacity: 1;
-          transform: scaleX(1);
-        }
-
         .p3-label {
-          font-family: 'Anton', sans-serif;
+          font-family: 'Bebas Neue', sans-serif;
           font-style: italic;
-          letter-spacing: 2px;
-          line-height: 0.88;
           display: block;
-          white-space: nowrap;
-          transition: color 0.12s ease, text-shadow 0.12s ease;
+          letter-spacing: 3px;
+          line-height: 0.88;
+          position: relative;
+          z-index: 1;
+          transition: color 0.15s ease, transform 0.15s ease;
           color: #1a4a8a;
+          transform: skewX(-8deg);
+          white-space: nowrap;
         }
         .p3-row.active .p3-label {
-          color: #ff2a2a;
-          text-shadow: 2px 2px 0px #7a0000;
+          color: #ffffff;
+          transform: skewX(-8deg) translateX(-8px);
         }
         .p3-row:hover:not(.active) .p3-label {
-          color: #3a6aaa;
+          color: #3a6ab0;
+        }
+
+        .p3-active-bar {
+          position: absolute;
+          right: -60px;
+          top: 50%;
+          transform: translateY(-50%) scaleX(0);
+          transform-origin: right center;
+          width: 100vw;
+          height: 100%;
+          background: #c4001a;
+          z-index: 0;
+          transition: transform 0.2s cubic-bezier(0.22,1,0.36,1);
+          clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%);
+        }
+        .p3-row.active .p3-active-bar {
+          transform: translateY(-50%) scaleX(1);
         }
 
         .p3-hint {
           position: absolute;
-          bottom: 20px; right: 28px;
+          bottom: 28px; right: 28px;
           z-index: 20;
           display: flex; flex-direction: column;
-          align-items: flex-end; gap: 5px;
-          font-family: 'Anton', sans-serif;
+          align-items: flex-end; gap: 6px;
+          font-family: 'Bebas Neue', sans-serif;
           opacity: 0;
-          transition: opacity 0.5s ease 1s;
+          transition: opacity 0.5s ease 0.9s;
         }
         .p3-hint.mounted { opacity: 1; }
         .p3-hint-row {
@@ -145,21 +165,19 @@ export default function P3Menu({ onNavigate }) {
           color: rgba(255,255,255,0.3);
         }
         .p3-hint-key {
-          border: 1px solid rgba(255,255,255,0.25);
+          border: 1px solid rgba(255,255,255,0.2);
           border-radius: 3px;
-          padding: 1px 6px; font-size: 11px;
+          padding: 1px 7px; font-size: 11px;
         }
 
-        .p3-name {
+        .p3-title {
           position: absolute;
-          top: 20px; left: 24px;
+          top: 28px; right: 28px;
           z-index: 20;
-          font-family: 'Anton', sans-serif;
-          font-style: italic;
-          font-size: 14px;
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 13px;
           letter-spacing: 4px;
-          color: rgba(255,255,255,0.3);
-          text-transform: uppercase;
+          color: rgba(255,255,255,0.25);
         }
       `}</style>
 
@@ -169,10 +187,11 @@ export default function P3Menu({ onNavigate }) {
           src="https://res.cloudinary.com/dt1acsnkg/video/upload/v1775838369/document_6253496834224824402_dpeupv.mp4"
           autoPlay loop muted playsInline
         />
-        <div className="p3-mask" />
+        <div className="p3-gradient" />
+        <div className="p3-scanlines" />
         <div className="p3-stripe" />
         <div className="p3-stripe2" />
-        <div className="p3-name">IpanBintang</div>
+        <div className="p3-title">MAIN MENU</div>
 
         <nav className="p3-menu">
           {ITEMS.map((item, i) => {
@@ -183,12 +202,14 @@ export default function P3Menu({ onNavigate }) {
             return (
               <div
                 key={item.id}
-                className={`p3-row${isActive ? " active" : ""}${mounted ? " mounted" : ""}`}
-                style={{ transitionDelay: mounted ? `${i * 70}ms` : "0ms" }}
+                className={`p3-row ${isActive ? "active" : ""} ${mounted ? "mounted" : ""}`}
+                style={{
+                  transitionDelay: mounted ? `${i * 70}ms` : "0ms",
+                }}
                 onMouseEnter={() => setActive(i)}
-                onClick={() => handleSelect(item.id)}
+                onClick={() => handleClick(item)}
               >
-                <div className="p3-triangle" />
+                <div className="p3-active-bar" />
                 <span
                   className="p3-label"
                   style={{ fontSize: item.fontSize, opacity }}
@@ -200,7 +221,7 @@ export default function P3Menu({ onNavigate }) {
           })}
         </nav>
 
-        <div className={`p3-hint${mounted ? " mounted" : ""}`}>
+        <div className={`p3-hint ${mounted ? "mounted" : ""}`}>
           <div className="p3-hint-row"><span className="p3-hint-key">↑↓</span><span>NAVIGATE</span></div>
           <div className="p3-hint-row"><span className="p3-hint-key">↵</span><span>CONFIRM</span></div>
         </div>
