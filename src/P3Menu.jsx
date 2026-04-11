@@ -2,24 +2,19 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ITEMS = [
-  { id: "about",  label: "ABOUT ME",    href: "#about",  fontSize: 130, offsetX: 0,  offsetY: 0  },
-  { id: "resume", label: "RESUME",      href: "#resume", fontSize: 108, offsetX: 38, offsetY: -8 },
-  { id: "github", label: "GITHUB LINK", href: "https://github.com/IpanBintang", fontSize: 88, offsetX: 14, offsetY: -6 },
+  { id: "about",   label: "ABOUT ME",    fontSize: 100 },
+  { id: "resume",  label: "RESUME",      fontSize: 82  },
+  { id: "github",  label: "GITHUB LINK", fontSize: 68  },
+  { id: "socials", label: "SOCIALS",     fontSize: 82  },
 ];
 
-const CLIP_SHAPES = [
-  (w, h) => `polygon(0px ${h*0.06}px, ${w - h*0.55}px 0px, ${w}px ${h*0.42}px, ${w - h*0.18}px ${h}px, 0px ${h*0.94}px)`,
-  (w, h) => `polygon(${h*0.12}px 0px, ${w - h*0.3}px ${h*0.04}px, ${w}px ${h*0.5}px, ${w - h*0.08}px ${h}px, 0px ${h*0.88}px)`,
-  (w, h) => `polygon(0px ${h*0.1}px, ${w - h*0.4}px 0px, ${w}px ${h*0.45}px, ${w - h*0.25}px ${h}px, ${h*0.05}px ${h*0.9}px)`,
-];
-
-export default function P3Menu({ onNavigate }) {  // ✅ Added onNavigate prop
+export default function P3Menu({ onNavigate }) {
   const navigate = useNavigate();
   const [active, setActive] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 80);
+    const t = setTimeout(() => setMounted(true), 100);
     return () => clearTimeout(t);
   }, []);
 
@@ -27,43 +22,21 @@ export default function P3Menu({ onNavigate }) {  // ✅ Added onNavigate prop
     const onKey = (e) => {
       if (e.key === "ArrowUp")   setActive(i => Math.max(0, i - 1));
       if (e.key === "ArrowDown") setActive(i => Math.min(ITEMS.length - 1, i + 1));
-      if (e.key === "Enter") {
-        const item = ITEMS[active];
-        handleItemClick(item);
-      }
+      if (e.key === "Enter")     handleSelect(ITEMS[active].id);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [active]);
 
-  const handleItemClick = (item) => {
-    switch (item.id) {
-      case "resume":
-        if (onNavigate) {
-          onNavigate("resume");  // ✅ Use parent prop
-        } else {
-          navigate("/resume");   // ✅ Fallback
-        }
-        break;
-      case "about":
-        if (onNavigate) {
-          onNavigate("about");
-        } else {
-          navigate("/about");
-        }
-        break;
-      case "github":
-        window.open(item.href, "_blank");  // ✅ External link
-        break;
-      default:
-        break;
-    }
+  const handleSelect = (id) => {
+    if (id === "github") { window.open("https://github.com/IpanBintang", "_blank"); return; }
+    onNavigate ? onNavigate(id) : navigate(`/${id}`);
   };
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 
         .p3-root {
           position: relative;
@@ -73,63 +46,35 @@ export default function P3Menu({ onNavigate }) {  // ✅ Added onNavigate prop
           overflow: hidden;
           display: flex;
           align-items: center;
+          justify-content: flex-end;
         }
         .p3-video {
           position: absolute;
           inset: 0;
           width: 100%; height: 100%;
           object-fit: cover;
-          opacity: 0.4;
+          opacity: 0.75;
           z-index: 0;
           pointer-events: none;
         }
-        .p3-circle {
+        .p3-mask {
           position: absolute;
-          right: -15vw; top: 50%;
-          transform: translateY(-50%);
-          width: 65vw; height: 65vw;
-          max-width: 700px; max-height: 700px;
-          border-radius: 50%;
-          background: radial-gradient(circle, #0d2560 0%, #060d2a 60%, transparent 100%);
+          inset: 0;
+          background: linear-gradient(to right, rgba(4,6,15,0.15) 0%, rgba(4,6,15,0.55) 60%, rgba(4,6,15,0.85) 100%);
           z-index: 1;
           pointer-events: none;
         }
-        .p3-bg-word {
-          position: absolute;
-          bottom: -2vw; left: -1vw;
-          font-family: 'Bebas Neue', sans-serif;
-          font-size: clamp(140px, 22vw, 300px);
-          color: rgba(255,255,255,0.025);
-          letter-spacing: -8px;
-          pointer-events: none;
-          z-index: 2;
-          white-space: nowrap;
-          user-select: none;
-        }
-        .p3-scanlines {
-          position: absolute; inset: 0;
-          background-image: repeating-linear-gradient(
-            0deg, transparent, transparent 3px,
-            rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
-          );
-          z-index: 3;
-          pointer-events: none;
-        }
-        .p3-mask {
-          position: absolute; inset: 0;
-          background: linear-gradient(to right, rgba(4,6,15,0.85) 0%, rgba(4,6,15,0.4) 50%, transparent 100%);
-          z-index: 4;
-          pointer-events: none;
-        }
-        .p3-stripe  { position:absolute; right:0; top:0; bottom:0; width:5px; background:#c4001a; z-index:10; }
-        .p3-stripe2 { position:absolute; right:9px; top:0; bottom:0; width:2px; background:rgba(196,0,26,0.22); z-index:10; }
+        .p3-stripe  { position:absolute; right:0; top:0; bottom:0; width:6px; background:#c4001a; z-index:10; }
+        .p3-stripe2 { position:absolute; right:10px; top:0; bottom:0; width:2px; background:rgba(196,0,26,0.3); z-index:10; }
 
         .p3-menu {
           position: relative;
           z-index: 20;
-          padding: 48px 0 48px 48px;
+          padding: 0 40px 0 0;
           display: flex;
           flex-direction: column;
+          align-items: flex-end;
+          gap: 0px;
         }
 
         .p3-row {
@@ -137,110 +82,113 @@ export default function P3Menu({ onNavigate }) {  // ✅ Added onNavigate prop
           cursor: pointer;
           display: flex;
           align-items: center;
+          justify-content: flex-end;
+          gap: 16px;
           line-height: 1;
-          text-decoration: none;
           opacity: 0;
-          transform: translateX(-36px);
+          transform: translateX(48px);
           transition: opacity 0.38s ease, transform 0.38s cubic-bezier(0.22,1,0.36,1);
-          user-select: none;
         }
         .p3-row.mounted {
-          opacity: 1 !important;
-          transform: translateX(0) !important;
+          opacity: 1;
+          transform: translateX(0);
         }
 
-        .p3-highlight {
-          position: absolute;
-          left: -48px; top: 50%;
-          transform: translateY(-50%) scaleX(0);
-          transform-origin: left center;
-          background: #f38493;
-          z-index: -1;
-          transition: transform 0.22s cubic-bezier(0.22,1,0.36,1);
-          pointer-events: none;
+        .p3-triangle {
+          width: 0; height: 0;
+          border-top: 14px solid transparent;
+          border-bottom: 14px solid transparent;
+          border-left: 24px solid #ff2a2a;
+          opacity: 0;
+          transform: scaleX(0);
+          transform-origin: right center;
+          transition: opacity 0.15s ease, transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+          flex-shrink: 0;
         }
-        .p3-row.active .p3-highlight {
-          transform: translateY(-50%) scaleX(1);
+        .p3-row.active .p3-triangle {
+          opacity: 1;
+          transform: scaleX(1);
         }
 
         .p3-label {
-          font-family: 'Bebas Neue', sans-serif;
-          display: block;
-          color: #2a5ca8;
+          font-family: 'Anton', sans-serif;
+          font-style: italic;
           letter-spacing: 2px;
-          line-height: 0.85;
-          position: relative;
-          z-index: 1;
-          transition: color 0.12s ease, opacity 0.12s ease;
+          line-height: 0.88;
+          display: block;
+          white-space: nowrap;
+          transition: color 0.12s ease, text-shadow 0.12s ease;
+          color: #1a4a8a;
         }
-        .p3-row.active .p3-label { color: #ffffff; }
-        .p3-row:hover:not(.active) .p3-label { color: #4a82c8; }
+        .p3-row.active .p3-label {
+          color: #ff2a2a;
+          text-shadow: 2px 2px 0px #7a0000;
+        }
+        .p3-row:hover:not(.active) .p3-label {
+          color: #3a6aaa;
+        }
 
         .p3-hint {
           position: absolute;
-          bottom: 24px; right: 28px;
+          bottom: 20px; right: 28px;
           z-index: 20;
           display: flex; flex-direction: column;
           align-items: flex-end; gap: 5px;
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: 'Anton', sans-serif;
           opacity: 0;
-          transition: opacity 0.5s ease 0.9s;
+          transition: opacity 0.5s ease 1s;
         }
         .p3-hint.mounted { opacity: 1; }
         .p3-hint-row {
           display: flex; align-items: center; gap: 8px;
           font-size: 13px; letter-spacing: 2px;
-          color: rgba(255,255,255,0.28);
+          color: rgba(255,255,255,0.3);
         }
         .p3-hint-key {
-          border: 1px solid rgba(255,255,255,0.2);
+          border: 1px solid rgba(255,255,255,0.25);
           border-radius: 3px;
           padding: 1px 6px; font-size: 11px;
+        }
+
+        .p3-name {
+          position: absolute;
+          top: 20px; left: 24px;
+          z-index: 20;
+          font-family: 'Anton', sans-serif;
+          font-style: italic;
+          font-size: 14px;
+          letter-spacing: 4px;
+          color: rgba(255,255,255,0.3);
+          text-transform: uppercase;
         }
       `}</style>
 
       <div className="p3-root">
-        <video className="p3-video" src="https://res.cloudinary.com/dt1acsnkg/video/upload/v1775838369/document_6253496834224824402_dpeupv.mp4" autoPlay loop muted playsInline />
-        <div className="p3-circle" />
-        <div className="p3-bg-word">SYSTEM</div>
-        <div className="p3-scanlines" />
+        <video
+          className="p3-video"
+          src="https://res.cloudinary.com/dt1acsnkg/video/upload/v1775838369/document_6253496834224824402_dpeupv.mp4"
+          autoPlay loop muted playsInline
+        />
         <div className="p3-mask" />
         <div className="p3-stripe" />
         <div className="p3-stripe2" />
+        <div className="p3-name">IpanBintang</div>
 
         <nav className="p3-menu">
           {ITEMS.map((item, i) => {
             const isActive = active === i;
             const dist = Math.abs(i - active);
-            const opacity = isActive ? 1 : Math.max(0.18, 1 - dist * 0.38);
-            const estW = item.label.length * item.fontSize * 0.6 + 80;
-            const estH = item.fontSize * 0.94;
-            const clipFn = CLIP_SHAPES[i] ?? CLIP_SHAPES[0];
+            const opacity = isActive ? 1 : Math.max(0.25, 1 - dist * 0.25);
 
             return (
               <div
                 key={item.id}
-                className={`p3-row ${isActive ? "active" : ""} ${mounted ? "mounted" : ""}`}
-                style={{
-                  marginLeft: item.offsetX,
-                  marginTop: item.offsetY,
-                  transitionDelay: mounted ? `${i * 80}ms` : "0ms",
-                }}
+                className={`p3-row${isActive ? " active" : ""}${mounted ? " mounted" : ""}`}
+                style={{ transitionDelay: mounted ? `${i * 70}ms` : "0ms" }}
                 onMouseEnter={() => setActive(i)}
-                onClick={() => handleItemClick(item)}
-                role="button"
-                tabIndex={0}
-                aria-current={isActive ? "page" : undefined}
-                aria-label={`Navigate to ${item.label.toLowerCase()}`}
+                onClick={() => handleSelect(item.id)}
               >
-                <div
-                  className="p3-highlight"
-                  style={{
-                    width: estW,
-                    height: estH,
-                    clipPath: clipFn(estW, estH),
-                  }}
-                />
+                <div className="p3-triangle" />
                 <span
                   className="p3-label"
                   style={{ fontSize: item.fontSize, opacity }}
@@ -252,7 +200,7 @@ export default function P3Menu({ onNavigate }) {  // ✅ Added onNavigate prop
           })}
         </nav>
 
-        <div className={`p3-hint ${mounted ? "mounted" : ""}`}>
+        <div className={`p3-hint${mounted ? " mounted" : ""}`}>
           <div className="p3-hint-row"><span className="p3-hint-key">↑↓</span><span>NAVIGATE</span></div>
           <div className="p3-hint-row"><span className="p3-hint-key">↵</span><span>CONFIRM</span></div>
         </div>
